@@ -1,0 +1,1171 @@
+[gd_scene load_steps=25 format=3 uid="uid://main_scene"]
+
+[ext_resource type="Script" path="res://scripts/World.gd" id="1_world"]
+[ext_resource type="Script" path="res://scripts/Hero.gd" id="2_hero"]
+[ext_resource type="Script" path="res://scripts/DungeonScene.gd" id="3_dungeon"]
+[ext_resource type="Script" path="res://scripts/HUD.gd" id="4_hud"]
+[ext_resource type="Script" path="res://scripts/MobileControls.gd" id="5_mobile"]
+
+[ext_resource type="Shader" path="res://shaders/water_reflection.gdshader" id="6_water_shader"]
+
+[sub_resource type="RectangleShape2D" id="ground_shape"]
+size = Vector2(40000, 160)
+
+[sub_resource type="CapsuleShape2D" id="hero_shape"]
+radius = 10.0
+height = 18.0
+
+[sub_resource type="Environment" id="env_neon"]
+background_mode = 1
+glow_enabled = true
+glow_normalized = false
+glow_intensity = 1.4
+glow_strength = 1.6
+glow_bloom = 0.65
+glow_blend_mode = 1
+glow_hdr_threshold = 0.65
+glow_hdr_scale = 2.5
+glow_map_strength = 0.8
+ambient_light_color = Color(0.08, 0.02, 0.18, 1)
+ambient_light_energy = 0.4
+
+[sub_resource type="ShaderMaterial" id="water_mat"]
+shader = ExtResource("6_water_shader")
+shader_parameter/wave_speed = 1.2
+shader_parameter/wave_strength = 0.012
+shader_parameter/wave_frequency = 18.0
+shader_parameter/wave_frequency2 = 11.0
+shader_parameter/alpha = 0.48
+shader_parameter/brightness = 0.60
+shader_parameter/blur_amount = 0.003
+shader_parameter/tint_color = Color(0.18, 0.05, 0.35, 1)
+shader_parameter/tint_strength = 0.32
+
+[sub_resource type="StyleBoxFlat" id="sb_panel"]
+bg_color                   = Color(0.039, 0.004, 0.094, 0.90)
+border_color               = Color(0.420, 0.129, 0.659, 0.85)
+border_width_left          = 2
+border_width_top           = 2
+border_width_right         = 2
+border_width_bottom        = 2
+corner_radius_top_left     = 12
+corner_radius_top_right    = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left  = 12
+shadow_color               = Color(0.420, 0.129, 0.659, 0.45)
+shadow_size                = 8
+shadow_offset              = Vector2(0, 2)
+content_margin_left        = 12.0
+content_margin_top         = 10.0
+content_margin_right       = 12.0
+content_margin_bottom      = 10.0
+
+[sub_resource type="StyleBoxFlat" id="sb_inv"]
+bg_color                   = Color(0.039, 0.004, 0.094, 0.85)
+border_color               = Color(0.541, 0.169, 0.886, 0.65)
+border_width_left          = 2
+border_width_top           = 2
+border_width_right         = 2
+border_width_bottom        = 2
+corner_radius_top_left     = 8
+corner_radius_top_right    = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left  = 8
+shadow_color               = Color(0.420, 0.129, 0.659, 0.35)
+shadow_size                = 5
+content_margin_left        = 6.0
+content_margin_top         = 4.0
+content_margin_right       = 6.0
+content_margin_bottom      = 4.0
+
+[sub_resource type="StyleBoxFlat" id="sb_herostats"]
+bg_color                   = Color(0.000, 0.000, 0.000, 0.62)
+border_color               = Color(1.000, 1.000, 1.000, 0.08)
+border_width_left          = 1
+border_width_top           = 1
+border_width_right         = 1
+border_width_bottom        = 0
+corner_radius_top_left     = 10
+corner_radius_top_right    = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left  = 10
+content_margin_left        = 10.0
+content_margin_top         = 8.0
+content_margin_right       = 10.0
+content_margin_bottom      = 8.0
+
+[sub_resource type="StyleBoxFlat" id="sb_topbar"]
+bg_color                   = Color(0.000, 0.000, 0.000, 0.75)
+border_color               = Color(0.000, 0.000, 0.000, 0.00)
+corner_radius_top_left     = 0
+corner_radius_top_right    = 0
+corner_radius_bottom_right = 10
+corner_radius_bottom_left  = 10
+content_margin_left        = 8.0
+content_margin_top         = 8.0
+content_margin_right       = 8.0
+content_margin_bottom      = 8.0
+
+[sub_resource type="StyleBoxFlat" id="sb_hp"]
+bg_color                   = Color(0.753, 0.161, 0.161, 1.0)
+shadow_color               = Color(0.906, 0.263, 0.235, 0.53)
+shadow_size                = 4
+shadow_offset              = Vector2(0, 0)
+corner_radius_top_left     = 6
+corner_radius_top_right    = 6
+corner_radius_bottom_left  = 6
+corner_radius_bottom_right = 6
+
+[sub_resource type="StyleBoxFlat" id="sb_xp"]
+bg_color                   = Color(0.247, 0.737, 0.518, 1.0)
+shadow_color               = Color(0.180, 0.800, 0.443, 0.53)
+shadow_size                = 4
+corner_radius_top_left     = 6
+corner_radius_top_right    = 6
+corner_radius_bottom_left  = 6
+corner_radius_bottom_right = 6
+
+[sub_resource type="StyleBoxFlat" id="sb_stamina"]
+bg_color                   = Color(0.165, 0.647, 0.322, 1.0)
+shadow_color               = Color(0.290, 0.871, 0.502, 0.53)
+shadow_size                = 4
+corner_radius_top_left     = 6
+corner_radius_top_right    = 6
+corner_radius_bottom_left  = 6
+corner_radius_bottom_right = 6
+
+[sub_resource type="StyleBoxFlat" id="sb_tc_hp"]
+bg_color                   = Color(0.753, 0.161, 0.161, 1.0)
+shadow_color               = Color(0.906, 0.263, 0.235, 0.53)
+shadow_size                = 4
+shadow_offset              = Vector2(0, 0)
+corner_radius_top_left     = 6
+corner_radius_top_right    = 6
+corner_radius_bottom_left  = 6
+corner_radius_bottom_right = 6
+
+[sub_resource type="StyleBoxFlat" id="sb_bar_bg"]
+bg_color                   = Color(1.0, 1.0, 1.0, 0.08)
+border_color               = Color(1.0, 1.0, 1.0, 0.12)
+border_width_left          = 1
+border_width_top           = 1
+border_width_right         = 1
+border_width_bottom        = 1
+corner_radius_top_left     = 6
+corner_radius_top_right    = 6
+corner_radius_bottom_left  = 6
+corner_radius_bottom_right = 6
+
+[sub_resource type="StyleBoxFlat" id="sb_notif"]
+bg_color                   = Color(0.000, 0.000, 0.000, 0.62)
+corner_radius_top_left     = 20
+corner_radius_top_right    = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left  = 20
+content_margin_left        = 20.0
+content_margin_top         = 7.0
+content_margin_right       = 20.0
+content_margin_bottom      = 7.0
+
+[sub_resource type="StyleBoxFlat" id="sb_banner"]
+bg_color                   = Color(0.039, 0.004, 0.094, 0.78)
+border_color               = Color(0.659, 0.400, 1.000, 0.60)
+border_width_left          = 1
+border_width_top           = 1
+border_width_right         = 1
+border_width_bottom        = 1
+corner_radius_top_left     = 20
+corner_radius_top_right    = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left  = 20
+shadow_color               = Color(0.659, 0.400, 1.000, 0.30)
+shadow_size                = 5
+content_margin_left        = 14.0
+content_margin_top         = 4.0
+content_margin_right       = 14.0
+content_margin_bottom      = 4.0
+
+[sub_resource type="StyleBoxFlat" id="sb_btn"]
+bg_color                   = Color(0.118, 0.106, 0.294, 0.85)
+border_color               = Color(0.486, 0.227, 0.929, 0.80)
+border_width_left          = 1
+border_width_top           = 1
+border_width_right         = 1
+border_width_bottom        = 1
+corner_radius_top_left     = 8
+corner_radius_top_right    = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left  = 8
+content_margin_left        = 12.0
+content_margin_top         = 8.0
+content_margin_right       = 12.0
+content_margin_bottom      = 8.0
+
+[sub_resource type="StyleBoxFlat" id="sb_btn_hover"]
+bg_color                   = Color(0.420, 0.129, 0.659, 0.85)
+border_color               = Color(0.659, 0.333, 0.969, 0.90)
+border_width_left          = 1
+border_width_top           = 1
+border_width_right         = 1
+border_width_bottom        = 1
+corner_radius_top_left     = 8
+corner_radius_top_right    = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left  = 8
+shadow_color               = Color(0.659, 0.333, 0.969, 0.55)
+shadow_size                = 8
+content_margin_left        = 12.0
+content_margin_top         = 8.0
+content_margin_right       = 12.0
+content_margin_bottom      = 8.0
+
+[sub_resource type="StyleBoxFlat" id="sb_btn_primary"]
+bg_color                   = Color(0.420, 0.129, 0.659, 0.65)
+border_color               = Color(0.659, 0.333, 0.969, 1.00)
+border_width_left          = 1
+border_width_top           = 1
+border_width_right         = 1
+border_width_bottom        = 1
+corner_radius_top_left     = 8
+corner_radius_top_right    = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left  = 8
+shadow_color               = Color(0.659, 0.333, 0.969, 0.40)
+shadow_size                = 6
+content_margin_left        = 12.0
+content_margin_top         = 8.0
+content_margin_right       = 12.0
+content_margin_bottom      = 8.0
+
+[sub_resource type="StyleBoxFlat" id="sb_gameover_btn"]
+bg_color                   = Color(0.486, 0.227, 0.929, 1.0)
+corner_radius_top_left     = 20
+corner_radius_top_right    = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left  = 20
+shadow_color               = Color(0.486, 0.227, 0.929, 0.53)
+shadow_size                = 8
+content_margin_left        = 36.0
+content_margin_top         = 12.0
+content_margin_right       = 36.0
+content_margin_bottom      = 12.0
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_world")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env_neon")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.92, 0.88, 1.00, 1.0)
+
+[node name="WaterRect" type="ColorRect" parent="."]
+z_index = 2
+position = Vector2(-640, 640)
+size = Vector2(1280, 32)
+material = SubResource("water_mat")
+
+[node name="Ground" type="StaticBody2D" parent="."]
+position = Vector2(0, 720)
+collision_layer = 1
+collision_mask = 6
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+shape = SubResource("ground_shape")
+
+[node name="WallBodies" type="Node2D" parent="."]
+
+[node name="DungeonScene" type="Node2D" parent="."]
+visible = false
+script = ExtResource("3_dungeon")
+
+[node name="Hero" type="CharacterBody2D" parent="."]
+position = Vector2(0, 620)
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("2_hero")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hero"]
+shape = SubResource("hero_shape")
+
+[node name="PlayerLight" type="PointLight2D" parent="Hero"]
+position = Vector2(0, -22)
+energy = 1.40
+color = Color(0.60, 0.30, 1.0, 1.0)
+texture_scale = 4.0
+shadow_enabled = false
+
+[node name="Camera2D" type="Camera2D" parent="Hero"]
+drag_horizontal_enabled = true
+drag_vertical_enabled = false
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+limit_left = -10000
+limit_right = 10000
+limit_top = 0
+limit_bottom = 720
+
+[node name="Allies" type="Node2D" parent="."]
+
+[node name="Enemies" type="Node2D" parent="."]
+
+[node name="Coins" type="Node2D" parent="."]
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("4_hud")
+
+[node name="TopBar" type="PanelContainer" parent="HUD"]
+anchors_preset = 12
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_bottom = 36.0
+grow_horizontal = 2
+add_theme_stylebox_override "panel" = SubResource("sb_topbar")
+
+[node name="HBox" type="HBoxContainer" parent="HUD/TopBar"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 16
+offset_left = 8.0
+offset_right = -8.0
+
+[node name="BiomeLabel" type="Label" parent="HUD/TopBar/HBox"]
+text = "🏰 KINGDOM"
+add_theme_color_override "font_color" = Color(0.988, 0.831, 0.302, 1)
+add_theme_font_size_override "font_size" = 13
+
+[node name="BuiltLabel" type="Label" parent="HUD/TopBar/HBox"]
+text = "🏗️ 0"
+add_theme_color_override "font_color" = Color(0.80, 0.80, 1.0, 1)
+add_theme_font_size_override "font_size" = 12
+
+[node name="GoldLabel" type="Label" parent="HUD/TopBar/HBox"]
+text = "💰 50 G"
+add_theme_color_override "font_color" = Color(1.0, 0.753, 0.161, 1)
+add_theme_font_size_override "font_size" = 14
+
+[node name="DayLabel" type="Label" parent="HUD/TopBar/HBox"]
+text = "Day 0"
+add_theme_color_override "font_color" = Color(0.80, 0.80, 1, 1)
+add_theme_font_size_override "font_size" = 12
+
+[node name="XPBox" type="VBoxContainer" parent="HUD/TopBar/HBox"]
+custom_minimum_size = Vector2(120, 0)
+alignment = 1
+
+[node name="XPLabel" type="Label" parent="HUD/TopBar/HBox/XPBox"]
+text = "XP"
+add_theme_color_override "font_color" = Color(0.6, 0.6, 0.6, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="XPBar" type="ProgressBar" parent="HUD/TopBar/HBox/XPBox"]
+custom_minimum_size = Vector2(120, 8)
+max_value = 100.0
+value = 0.0
+show_percentage = false
+
+[node name="LevelLabel" type="Label" parent="HUD/TopBar/HBox"]
+text = "LVL 1"
+add_theme_color_override "font_color" = Color(1, 1, 1, 1)
+add_theme_font_size_override "font_size" = 16
+
+[node name="Sep1" type="VSeparator" parent="HUD/TopBar/HBox"]
+
+[node name="LeftWallBox" type="VBoxContainer" parent="HUD/TopBar/HBox"]
+custom_minimum_size = Vector2(120, 0)
+alignment = 1
+
+[node name="LWLabel" type="Label" parent="HUD/TopBar/HBox/LeftWallBox"]
+text = "Left Wall HP"
+add_theme_color_override "font_color" = Color(0.6, 0.6, 0.6, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="LWBar" type="ProgressBar" parent="HUD/TopBar/HBox/LeftWallBox"]
+custom_minimum_size = Vector2(120, 8)
+max_value = 100.0
+value = 0.0
+show_percentage = false
+add_theme_stylebox_override "fill" = SubResource("sb_tc_hp")
+add_theme_stylebox_override "background" = SubResource("sb_bar_bg")
+
+[node name="LWText" type="Label" parent="HUD/TopBar/HBox/LeftWallBox"]
+text = "0/100"
+add_theme_color_override "font_color" = Color(0.6, 0.6, 0.6, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="TCBox" type="VBoxContainer" parent="HUD/TopBar/HBox"]
+custom_minimum_size = Vector2(130, 0)
+alignment = 1
+
+[node name="TCLabel" type="Label" parent="HUD/TopBar/HBox/TCBox"]
+text = "TC"
+add_theme_color_override "font_color" = Color(0.6, 0.6, 0.6, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="TCBar" type="ProgressBar" parent="HUD/TopBar/HBox/TCBox"]
+custom_minimum_size = Vector2(130, 8)
+max_value = 1000.0
+value = 1000.0
+show_percentage = false
+add_theme_stylebox_override "fill" = SubResource("sb_tc_hp")
+add_theme_stylebox_override "background" = SubResource("sb_bar_bg")
+
+[node name="TCText" type="Label" parent="HUD/TopBar/HBox/TCBox"]
+text = "1000/1000"
+add_theme_color_override "font_color" = Color(0.6, 0.6, 0.6, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="Sep2" type="VSeparator" parent="HUD/TopBar/HBox"]
+
+[node name="RightWallBox" type="VBoxContainer" parent="HUD/TopBar/HBox"]
+custom_minimum_size = Vector2(120, 0)
+alignment = 1
+
+[node name="RWLabel" type="Label" parent="HUD/TopBar/HBox/RightWallBox"]
+text = "Right Wall HP"
+add_theme_color_override "font_color" = Color(0.6, 0.6, 0.6, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="RWBar" type="ProgressBar" parent="HUD/TopBar/HBox/RightWallBox"]
+custom_minimum_size = Vector2(120, 8)
+max_value = 100.0
+value = 0.0
+show_percentage = false
+add_theme_stylebox_override "fill" = SubResource("sb_tc_hp")
+add_theme_stylebox_override "background" = SubResource("sb_bar_bg")
+
+[node name="RWText" type="Label" parent="HUD/TopBar/HBox/RightWallBox"]
+text = "0/100"
+add_theme_color_override "font_color" = Color(0.6, 0.6, 0.6, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="HeroStats" type="PanelContainer" parent="HUD"]
+anchors_preset = 7
+anchor_left = 0.0
+anchor_top = 1.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -98.0
+offset_right = 234.0
+offset_bottom = -22.0
+add_theme_stylebox_override "panel" = SubResource("sb_herostats")
+
+[node name="Inner" type="VBoxContainer" parent="HUD/HeroStats"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 4
+
+[node name="LevelLabel" type="Label" parent="HUD/HeroStats/Inner"]
+text = "LV 1"
+add_theme_color_override "font_color" = Color(0.75, 0.51, 0.99, 1)
+add_theme_font_size_override "font_size" = 13
+
+[node name="HPBar" type="ProgressBar" parent="HUD/HeroStats/Inner"]
+custom_minimum_size = Vector2(210, 10)
+max_value = 100.0
+value = 100.0
+show_percentage = false
+add_theme_stylebox_override "fill" = SubResource("sb_hp")
+add_theme_stylebox_override "background" = SubResource("sb_bar_bg")
+
+[node name="XPBar" type="ProgressBar" parent="HUD/HeroStats/Inner"]
+custom_minimum_size = Vector2(210, 10)
+max_value = 100.0
+value = 0.0
+show_percentage = false
+add_theme_stylebox_override "fill" = SubResource("sb_xp")
+add_theme_stylebox_override "background" = SubResource("sb_bar_bg")
+
+[node name="StaminaBar" type="ProgressBar" parent="HUD/HeroStats/Inner"]
+custom_minimum_size = Vector2(210, 10)
+max_value = 100.0
+value = 100.0
+show_percentage = false
+add_theme_stylebox_override "fill" = SubResource("sb_stamina")
+add_theme_stylebox_override "background" = SubResource("sb_bar_bg")
+
+[node name="BuildPrompt" type="Panel" parent="HUD"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -170.0
+offset_top = -55.0
+offset_right = 170.0
+offset_bottom = 55.0
+add_theme_stylebox_override "panel" = SubResource("sb_panel")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/BuildPrompt"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
+alignment = 1
+theme_override_constants/separation = 6
+
+[node name="PromptTitle" type="Label" parent="HUD/BuildPrompt/VBox"]
+text = "Building"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.99, 0.83, 0.30, 1)
+add_theme_font_size_override "font_size" = 15
+
+[node name="PromptDesc" type="RichTextLabel" parent="HUD/BuildPrompt/VBox"]
+custom_minimum_size = Vector2(0, 28)
+bbcode_enabled = true
+text = "[center]SPACE to build[/center]"
+fit_content = true
+
+[node name="Notification" type="Label" parent="HUD"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -260.0
+offset_top = -55.0
+offset_right = 260.0
+offset_bottom = -28.0
+horizontal_alignment = 1
+add_theme_font_size_override "font_size" = 14
+add_theme_stylebox_override "normal" = SubResource("sb_notif")
+
+[node name="DayBanner" type="Label" parent="HUD"]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -200.0
+offset_top = 72.0
+offset_right = 200.0
+offset_bottom = 100.0
+horizontal_alignment = 1
+add_theme_font_size_override "font_size" = 12
+add_theme_stylebox_override "normal" = SubResource("sb_banner")
+
+[node name="GameOver" type="Control" parent="HUD"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="BG" type="ColorRect" parent="HUD/GameOver"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.82)
+
+[node name="VBox" type="VBoxContainer" parent="HUD/GameOver"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -120.0
+offset_right = 200.0
+offset_bottom = 120.0
+alignment = 1
+
+[node name="Title" type="Label" parent="HUD/GameOver/VBox"]
+text = "💀 GAME OVER"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.93, 0.27, 0.27, 1)
+add_theme_font_size_override "font_size" = 42
+
+[node name="SubText" type="Label" parent="HUD/GameOver/VBox"]
+text = "Your kingdom has fallen..."
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.80, 0.80, 0.80, 1)
+add_theme_font_size_override "font_size" = 18
+
+[node name="RestartBtn" type="Button" parent="HUD/GameOver/VBox"]
+text = "MAIN MENU"
+add_theme_font_size_override "font_size" = 20
+add_theme_stylebox_override "normal" = SubResource("sb_gameover_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_primary")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+add_theme_color_override "font_color" = Color(1.0, 1.0, 1.0, 1.0)
+
+[node name="BarracksMenu" type="Panel" parent="HUD"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -170.0
+offset_top = -175.0
+offset_right = 170.0
+offset_bottom = 175.0
+add_theme_stylebox_override "panel" = SubResource("sb_panel")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/BarracksMenu"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="HUD/BarracksMenu/VBox"]
+text = "🛡️ BARRACKS"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.94, 0.27, 0.27, 1)
+add_theme_font_size_override "font_size" = 17
+
+[node name="ArcherCount" type="Label" parent="HUD/BarracksMenu/VBox"]
+text = "Archers: 0"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.70, 0.85, 1, 1)
+add_theme_font_size_override "font_size" = 12
+
+[node name="WarriorCount" type="Label" parent="HUD/BarracksMenu/VBox"]
+text = "Warriors: 0"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(1, 0.70, 0.30, 1)
+add_theme_font_size_override "font_size" = 12
+
+[node name="RecruitArcher" type="Button" parent="HUD/BarracksMenu/VBox"]
+text = "🏹  Recruit Archer  [10G]"
+add_theme_font_size_override "font_size" = 14
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+
+[node name="RecruitWarrior" type="Button" parent="HUD/BarracksMenu/VBox"]
+text = "⚔  Recruit Warrior  [10G]"
+add_theme_font_size_override "font_size" = 14
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+
+[node name="AssignLeft" type="Button" parent="HUD/BarracksMenu/VBox"]
+text = "← Assign to West Wall"
+add_theme_font_size_override "font_size" = 13
+
+[node name="AssignRight" type="Button" parent="HUD/BarracksMenu/VBox"]
+text = "→ Assign to East Wall"
+add_theme_font_size_override "font_size" = 13
+
+[node name="CloseBtn" type="Button" parent="HUD/BarracksMenu/VBox"]
+text = "✕  Close"
+add_theme_color_override "font_color" = Color(0.6, 0.6, 0.6, 1)
+add_theme_font_size_override "font_size" = 13
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+
+[node name="ForgeMenu" type="Panel" parent="HUD"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -170.0
+offset_top = -120.0
+offset_right = 170.0
+offset_bottom = 120.0
+add_theme_stylebox_override "panel" = SubResource("sb_panel")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/ForgeMenu"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="HUD/ForgeMenu/VBox"]
+text = "🔮 ARCANE FORGE"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.96, 0.62, 0.04, 1)
+add_theme_font_size_override "font_size" = 17
+
+[node name="UpgArcher" type="Button" parent="HUD/ForgeMenu/VBox"]
+text = "⬆ Archers Lv1→2  [20G]"
+add_theme_font_size_override "font_size" = 14
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+
+[node name="UpgWarrior" type="Button" parent="HUD/ForgeMenu/VBox"]
+text = "⬆ Warriors Lv1→2  [20G]"
+add_theme_font_size_override "font_size" = 14
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+
+[node name="CloseBtn" type="Button" parent="HUD/ForgeMenu/VBox"]
+text = "✕  Close"
+add_theme_color_override "font_color" = Color(0.6, 0.6, 0.6, 1)
+add_theme_font_size_override "font_size" = 13
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+
+[node name="WallMenu" type="Panel" parent="HUD"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -175.0
+offset_top = -135.0
+offset_right = 175.0
+offset_bottom = 135.0
+add_theme_stylebox_override "panel" = SubResource("sb_panel")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/WallMenu"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="HUD/WallMenu/VBox"]
+text = "🏰 WALL CONFIG"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.49, 0.23, 0.93, 1)
+add_theme_font_size_override "font_size" = 17
+
+[node name="Info" type="Label" parent="HUD/WallMenu/VBox"]
+text = "Archers: 0/2  |  Free: 0"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.8, 0.8, 0.8, 1)
+add_theme_font_size_override "font_size" = 12
+
+[node name="AssignArcher" type="Button" parent="HUD/WallMenu/VBox"]
+text = "Assign Free Archer (0)"
+add_theme_font_size_override "font_size" = 14
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+
+[node name="UpgradeWall" type="Button" parent="HUD/WallMenu/VBox"]
+text = "⬆ Upgrade to Lv2  [10G]"
+add_theme_font_size_override "font_size" = 14
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+
+[node name="CloseBtn" type="Button" parent="HUD/WallMenu/VBox"]
+text = "✕  Close"
+add_theme_color_override "font_color" = Color(0.6, 0.6, 0.6, 1)
+add_theme_font_size_override "font_size" = 13
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+
+[node name="ShopMenu" type="Panel" parent="HUD"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+add_theme_stylebox_override "panel" = SubResource("sb_panel")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/ShopMenu"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="HUD/ShopMenu/VBox"]
+text = "⚔️ WEAPON SHOP"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.98, 0.57, 0.09, 1)
+add_theme_font_size_override "font_size" = 17
+
+[node name="Desc" type="Label" parent="HUD/ShopMenu/VBox"]
+text = "Choose your weapon:"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.7, 0.7, 0.7, 1)
+add_theme_font_size_override "font_size" = 12
+
+[node name="BtnSword" type="Button" parent="HUD/ShopMenu/VBox"]
+text = "🗡️ Silver Sword  [20G]  40 DMG  (Short range)"
+add_theme_color_override "font_color" = Color(0.98, 0.83, 0.30, 1)
+add_theme_font_size_override "font_size" = 13
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+
+[node name="BtnSpear" type="Button" parent="HUD/ShopMenu/VBox"]
+text = "🔱 Iron Spear  [20G]  25 DMG  (Medium range)"
+add_theme_color_override "font_color" = Color(0.63, 0.85, 1.0, 1)
+add_theme_font_size_override "font_size" = 13
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+
+[node name="BtnBow" type="Button" parent="HUD/ShopMenu/VBox"]
+text = "🏹 Ranger Bow  [20G]  15 DMG  (Ranged — Q to shoot)"
+add_theme_color_override "font_color" = Color(0.67, 1.0, 0.67, 1)
+add_theme_font_size_override "font_size" = 13
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+
+[node name="WeaponLabel" type="Label" parent="HUD/ShopMenu/VBox"]
+name = "WeaponLabel"
+text = "Current: None"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.6, 0.6, 0.6, 1)
+add_theme_font_size_override "font_size" = 12
+
+[node name="CloseBtn" type="Button" parent="HUD/ShopMenu/VBox"]
+text = "✕  Close"
+add_theme_color_override "font_color" = Color(0.6, 0.6, 0.6, 1)
+add_theme_font_size_override "font_size" = 13
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+
+[node name="SmithMenu" type="Panel" parent="HUD"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -210.0
+offset_top = -210.0
+offset_right = 210.0
+offset_bottom = 210.0
+add_theme_stylebox_override "panel" = SubResource("sb_panel")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/SmithMenu"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="HUD/SmithMenu/VBox"]
+text = "🔨 BLACKSMITH"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.98, 0.57, 0.09, 1)
+add_theme_font_size_override "font_size" = 17
+
+[node name="Items" type="VBoxContainer" parent="HUD/SmithMenu/VBox"]
+
+[node name="CloseBtn" type="Button" parent="HUD/SmithMenu/VBox"]
+text = "✕  Close"
+add_theme_color_override "font_color" = Color(0.6, 0.6, 0.6, 1)
+add_theme_font_size_override "font_size" = 13
+add_theme_stylebox_override "normal" = SubResource("sb_btn")
+add_theme_stylebox_override "hover" = SubResource("sb_btn_hover")
+add_theme_stylebox_override "pressed" = SubResource("sb_btn")
+
+[node name="InventoryPanel" type="Panel" parent="HUD"]
+visible = false
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -290.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 330.0
+add_theme_stylebox_override "panel" = SubResource("sb_inv")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/InventoryPanel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="HUD/InventoryPanel/VBox"]
+text = "🎒 EQUIPMENT  [I]"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.85, 0.70, 1, 1)
+add_theme_font_size_override "font_size" = 14
+
+[node name="Grid" type="GridContainer" parent="HUD/InventoryPanel/VBox"]
+columns = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+
+[node name="Slot_helmet" type="Panel" parent="HUD/InventoryPanel/VBox/Grid"]
+custom_minimum_size = Vector2(122, 48)
+add_theme_stylebox_override "panel" = SubResource("sb_inv")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/InventoryPanel/VBox/Grid/Slot_helmet"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 4.0
+offset_right = -5.0
+offset_bottom = -4.0
+
+[node name="SlotLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_helmet/VBox"]
+text = "⛑ HELMET"
+add_theme_color_override "font_color" = Color(0.8, 0.8, 0.8, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="ItemLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_helmet/VBox"]
+text = "[Empty]"
+add_theme_color_override "font_color" = Color(0.45, 0.45, 0.45, 1)
+add_theme_font_size_override "font_size" = 11
+
+[node name="StatLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_helmet/VBox"]
+text = ""
+add_theme_color_override "font_color" = Color(0.30, 0.87, 0.50, 1)
+add_theme_font_size_override "font_size" = 10
+
+[node name="Slot_weapon" type="Panel" parent="HUD/InventoryPanel/VBox/Grid"]
+custom_minimum_size = Vector2(122, 48)
+add_theme_stylebox_override "panel" = SubResource("sb_inv")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/InventoryPanel/VBox/Grid/Slot_weapon"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 4.0
+offset_right = -5.0
+offset_bottom = -4.0
+
+[node name="SlotLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_weapon/VBox"]
+text = "⚔ WEAPON"
+add_theme_color_override "font_color" = Color(0.8, 0.8, 0.8, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="ItemLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_weapon/VBox"]
+text = "[Empty]"
+add_theme_color_override "font_color" = Color(0.45, 0.45, 0.45, 1)
+add_theme_font_size_override "font_size" = 11
+
+[node name="StatLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_weapon/VBox"]
+text = ""
+add_theme_color_override "font_color" = Color(0.30, 0.87, 0.50, 1)
+add_theme_font_size_override "font_size" = 10
+
+[node name="Slot_shield" type="Panel" parent="HUD/InventoryPanel/VBox/Grid"]
+custom_minimum_size = Vector2(122, 48)
+add_theme_stylebox_override "panel" = SubResource("sb_inv")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/InventoryPanel/VBox/Grid/Slot_shield"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 4.0
+offset_right = -5.0
+offset_bottom = -4.0
+
+[node name="SlotLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_shield/VBox"]
+text = "🛡 SHIELD"
+add_theme_color_override "font_color" = Color(0.8, 0.8, 0.8, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="ItemLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_shield/VBox"]
+text = "[Empty]"
+add_theme_color_override "font_color" = Color(0.45, 0.45, 0.45, 1)
+add_theme_font_size_override "font_size" = 11
+
+[node name="StatLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_shield/VBox"]
+text = ""
+add_theme_color_override "font_color" = Color(0.30, 0.87, 0.50, 1)
+add_theme_font_size_override "font_size" = 10
+
+[node name="Slot_armor" type="Panel" parent="HUD/InventoryPanel/VBox/Grid"]
+custom_minimum_size = Vector2(122, 48)
+add_theme_stylebox_override "panel" = SubResource("sb_inv")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/InventoryPanel/VBox/Grid/Slot_armor"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 4.0
+offset_right = -5.0
+offset_bottom = -4.0
+
+[node name="SlotLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_armor/VBox"]
+text = "🥋 ARMOR"
+add_theme_color_override "font_color" = Color(0.8, 0.8, 0.8, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="ItemLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_armor/VBox"]
+text = "[Empty]"
+add_theme_color_override "font_color" = Color(0.45, 0.45, 0.45, 1)
+add_theme_font_size_override "font_size" = 11
+
+[node name="StatLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_armor/VBox"]
+text = ""
+add_theme_color_override "font_color" = Color(0.30, 0.87, 0.50, 1)
+add_theme_font_size_override "font_size" = 10
+
+[node name="Slot_boots" type="Panel" parent="HUD/InventoryPanel/VBox/Grid"]
+custom_minimum_size = Vector2(122, 48)
+add_theme_stylebox_override "panel" = SubResource("sb_inv")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/InventoryPanel/VBox/Grid/Slot_boots"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 4.0
+offset_right = -5.0
+offset_bottom = -4.0
+
+[node name="SlotLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_boots/VBox"]
+text = "🥿 BOOTS"
+add_theme_color_override "font_color" = Color(0.8, 0.8, 0.8, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="ItemLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_boots/VBox"]
+text = "[Empty]"
+add_theme_color_override "font_color" = Color(0.45, 0.45, 0.45, 1)
+add_theme_font_size_override "font_size" = 11
+
+[node name="StatLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_boots/VBox"]
+text = ""
+add_theme_color_override "font_color" = Color(0.30, 0.87, 0.50, 1)
+add_theme_font_size_override "font_size" = 10
+
+[node name="Slot_medallion" type="Panel" parent="HUD/InventoryPanel/VBox/Grid"]
+custom_minimum_size = Vector2(122, 48)
+add_theme_stylebox_override "panel" = SubResource("sb_inv")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/InventoryPanel/VBox/Grid/Slot_medallion"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 4.0
+offset_right = -5.0
+offset_bottom = -4.0
+
+[node name="SlotLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_medallion/VBox"]
+text = "📿 MEDALLION"
+add_theme_color_override "font_color" = Color(0.8, 0.8, 0.8, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="ItemLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_medallion/VBox"]
+text = "[Empty]"
+add_theme_color_override "font_color" = Color(0.45, 0.45, 0.45, 1)
+add_theme_font_size_override "font_size" = 11
+
+[node name="StatLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_medallion/VBox"]
+text = ""
+add_theme_color_override "font_color" = Color(0.30, 0.87, 0.50, 1)
+add_theme_font_size_override "font_size" = 10
+
+[node name="Slot_ring" type="Panel" parent="HUD/InventoryPanel/VBox/Grid"]
+custom_minimum_size = Vector2(122, 48)
+add_theme_stylebox_override "panel" = SubResource("sb_inv")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/InventoryPanel/VBox/Grid/Slot_ring"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 4.0
+offset_right = -5.0
+offset_bottom = -4.0
+
+[node name="SlotLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_ring/VBox"]
+text = "💍 RING"
+add_theme_color_override "font_color" = Color(0.8, 0.8, 0.8, 1)
+add_theme_font_size_override "font_size" = 9
+
+[node name="ItemLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_ring/VBox"]
+text = "[Empty]"
+add_theme_color_override "font_color" = Color(0.45, 0.45, 0.45, 1)
+add_theme_font_size_override "font_size" = 11
+
+[node name="StatLabel" type="Label" parent="HUD/InventoryPanel/VBox/Grid/Slot_ring/VBox"]
+text = ""
+add_theme_color_override "font_color" = Color(0.30, 0.87, 0.50, 1)
+add_theme_font_size_override "font_size" = 10
+
+[node name="HintBar" type="Label" parent="HUD"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -26.0
+grow_vertical = 0
+text = "← → Move  |  SHIFT Sprint  |  E Attack  |  Q Shoot (bow needed)  |  SPACE Interact  |  G Rally (toggle)  |  T Teleport  |  I Inventory"
+horizontal_alignment = 1
+add_theme_color_override "font_color" = Color(0.75, 0.75, 0.75, 0.85)
+add_theme_font_size_override "font_size" = 12
+
+[node name="MobileControls" type="CanvasLayer" parent="."]
+script = ExtResource("5_mobile")
+
+[node name="Joystick" type="Control" parent="MobileControls"]
+position = Vector2(60, 580)
+size = Vector2(120, 120)
+
+[node name="JoystickBase" type="ColorRect" parent="MobileControls/Joystick"]
+size = Vector2(120, 120)
+color = Color(1, 1, 1, 0.2)
+
+[node name="JoystickKnob" type="ColorRect" parent="MobileControls/Joystick"]
+position = Vector2(30, 30)
+size = Vector2(60, 60)
+color = Color(1, 1, 1, 0.4)
+
+[node name="JumpBtn" type="Button" parent="MobileControls"]
+position = Vector2(1100, 610)
+size = Vector2(80, 80)
+text = "⬆"
+
+[node name="AttackBtn" type="Button" parent="MobileControls"]
+position = Vector2(1000, 610)
+size = Vector2(80, 80)
+text = "⚔"
+
+[node name="InteractBtn" type="Button" parent="MobileControls"]
+position = Vector2(900, 610)
+size = Vector2(80, 80)
+text = "E"
+
+[node name="ShootBtn" type="Button" parent="MobileControls"]
+position = Vector2(1100, 520)
+size = Vector2(80, 80)
+text = "🏹"
